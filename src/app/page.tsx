@@ -39,7 +39,7 @@ export default function HomePage() {
 
       if (!res.ok) {
         setStatus('error');
-        setErrorMessage(data.error || 'Failed to submit the form.');
+        setErrorMessage(data.detail || data.error || 'Failed to submit the form.');
       } else {
         setStatus('success');
         setFormData({ name: '', email: '', mobile: '', message: '' });
