@@ -1,17 +1,19 @@
 'use client';
 
+import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import TextField from '@/components/form/TextField';
-import TextArea from '@/components/form/TextArea';
-import Button from '@/components/ui/Button';
+
 import Alert from '@/components/feedback/Alert';
-import { useState } from 'react';
+import TextArea from '@/components/form/TextArea';
+import TextField from '@/components/form/TextField';
+import Button from '@/components/ui/Button';
 
 const ContactSchema = z.object({
   name: z.string().min(2, 'Name is too short'),
   email: z.string().email('Invalid email'),
+  mobile: z.string().min(5, 'Mobile is too short'),
   message: z.string().min(10, 'Message must be at least 10 characters')
 });
 
@@ -23,17 +25,20 @@ export default function ContactPage() {
 
   const form = useForm<ContactValues>({
     resolver: zodResolver(ContactSchema),
-    defaultValues: { name: '', email: '', message: '' }
+    defaultValues: { name: '', email: '', mobile: '', message: '' }
   });
 
   async function onSubmit(values: ContactValues) {
     setStatus('idle');
     setErrorMessage(null);
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch('https://staging-api.raihsuite.com/v1/crm/enquiries/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
+        body: JSON.stringify({
+          ...values,
+          tenant: 39
+        })
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -73,6 +78,12 @@ export default function ContactPage() {
           type="email"
           {...form.register('email')}
           error={form.formState.errors.email?.message}
+        />
+        <TextField
+          label="Mobile"
+          type="tel"
+          {...form.register('mobile')}
+          error={form.formState.errors.mobile?.message}
         />
         <TextArea
           label="Message"

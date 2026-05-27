@@ -1,14 +1,15 @@
-import * as z from 'zod';
-import { rateLimitCheck } from '@/lib/rateLimit';
-import { getEnv } from '@/lib/env';
 import { NextResponse } from 'next/server';
+import * as z from 'zod';
+
+import { rateLimitCheck } from '@/lib/rateLimit';
 
 export const runtime = 'edge';
 
 const ContactSchema = z.object({
   name: z.string().min(2).max(200),
   email: z.string().email(),
-  message: z.string().min(10).max(5000)
+  mobile: z.string().min(5).max(30),
+  message: z.string().min(2).max(5000)
 });
 
 async function verifyTurnstile(): Promise<boolean> {
@@ -16,7 +17,6 @@ async function verifyTurnstile(): Promise<boolean> {
 }
 
 export async function POST(req: Request) {
-  const env = getEnv();
   let body: unknown;
 
   try {
@@ -44,38 +44,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Captcha failed' }, { status: 403 });
   }
 
-  const { name, email, message } = parsed.data;
+  const { name, email, mobile, message } = parsed.data;
   const payload = {
-    tenantId: env.TENANT_ID,
     name,
+    mobile,
     email,
     message,
-    meta: {
-      ua: req.headers.get('user-agent'),
-      timestamp: new Date().toISOString()
-    }
+    tenant: 39
   };
 
-  /*
   try {
-    const upstream = await fetch(`${env.RAISUITE_API_BASE}/enquiry`, {
+    const upstream = await fetch('https://staging-api.raihsuite.com/v1/crm/enquiries/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${env.RAISUITE_API_KEY}`
       },
       body: JSON.stringify(payload)
     });
 
     if (!upstream.ok) {
-      return NextResponse.json({ error: 'Upstream error' }, { status: 502 });
+      const errorText = await upstream.text();
+      console.error('[contact] Upstream error response:', errorText);
+      return NextResponse.json({ error: 'Upstream error submitting enquiry' }, { status: 502 });
     }
-  } catch {
-    return NextResponse.json({ error: 'Network error' }, { status: 502 });
+
+    const data = await upstream.json();
+    return NextResponse.json({ status: 'ok', data }, { status: 200 });
+  } catch (err) {
+    console.error('[contact] Network error:', err);
+    return NextResponse.json({ error: 'Network error connecting to CRM backend' }, { status: 502 });
   }
-  */
-
-  console.log('[contact] Received enquiry', payload);
-
-  return NextResponse.json({ status: 'ok' }, { status: 200 });
 }
