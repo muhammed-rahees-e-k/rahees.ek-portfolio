@@ -145,7 +145,7 @@ export default function HomePage() {
 
           {/* Right Image */}
           <div className="about-image">
-            <img src="/images/about rahees.jpg" alt="About Rahees" />
+            <img src="/images/about-image-portfolio.png" alt="About Rahees" />
           </div>
         </div>
       </section>
