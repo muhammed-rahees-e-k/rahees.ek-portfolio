@@ -43,7 +43,7 @@ export default function ContactPage() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         setStatus('error');
-        setErrorMessage(data.error || 'Unexpected error');
+        setErrorMessage(data.detail || data.error || 'Unexpected error');
         return;
       }
       setStatus('success');
