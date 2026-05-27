@@ -1,29 +1,31 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { Poppins } from 'next/font/google';
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-poppins',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  title: 'Raisuite Web Starter',
-  description: 'Reusable starter template for multi-tenant Raisuite client sites.'
+  title: 'Rahees | Portfolio',
+  description: 'Software Engineer and UI/UX Designer Portfolio.',
+  icons: {
+    icon: '/images/favicon.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={poppins.variable}>
+      <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+      </head>
       <body>
-        <header className="border-b mb-6">
-          <div className="container-base py-4 flex items-center justify-between">
-            <h1 className="text-xl font-semibold">Raisuite Starter</h1>
-            <nav className="flex gap-4">
-              <a href="/">Home</a>
-              <a href="/contact">Contact</a>
-            </nav>
-          </div>
-        </header>
-        <main className="container-base">{children}</main>
-        <footer className="container-base py-10 text-sm text-gray-500">
-          &copy; {new Date().getFullYear()} Raisuite Starter. All rights reserved.
-        </footer>
+        {children}
       </body>
     </html>
   );
-}
+}
