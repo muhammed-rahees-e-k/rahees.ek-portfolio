@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+
+import { projects } from '@/data/projects';
 
 export default function HomePage() {
   const [isNavActive, setIsNavActive] = useState(false);
@@ -9,6 +12,9 @@ export default function HomePage() {
   const [formData, setFormData] = useState({ name: '', email: '', mobile: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Projects filter state
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -260,92 +266,40 @@ export default function HomePage() {
           <h2 className="section-title">MY PROJECTS</h2>
         </div>
 
+        <div className="project-filters">
+          {['All', 'Web Apps', 'Mobile Apps', 'UI/UX Design'].map((cat) => (
+            <button
+              key={cat}
+              className={`filter-btn ${selectedCategory === cat ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
         <div className="project-grid">
-          {/* Project 1 */}
-          <div className="project-card">
-            <div className="project-img">
-              <img src="/images/raih-project-1.png" alt="Irshadiyya College" />
-            </div>
-            <div className="project-content">
-              <h3>Irshadiyya College Website</h3>
-              <p>
-                A responsive college website developed with a clean layout, modern design, and optimized performance.
-              </p>
-              <div className="tech-used">
-                <span>HTML</span><span>CSS</span><span>JavaScript</span><span>Bootstrap</span>
+          {projects
+            .filter((p) => selectedCategory === 'All' || p.category === selectedCategory)
+            .map((project) => (
+              <div key={project.slug} className="project-card">
+                <div className="project-img">
+                  <img src={project.image} alt={project.name} />
+                </div>
+                <div className="project-content">
+                  <h3>{project.name}</h3>
+                  <p>{project.description}</p>
+                  <div className="tech-used">
+                    {project.tech.map((t) => (
+                      <span key={t}>{t}</span>
+                    ))}
+                  </div>
+                  <Link href={`/projects/${project.slug}`} className="source-link">
+                    View Details <i className="bi bi-arrow-up-right"></i>
+                  </Link>
+                </div>
               </div>
-              <a href="https://github.com" className="source-link" target="_blank" rel="noopener noreferrer">View Source <i className="bi bi-arrow-up-right"></i></a>
-            </div>
-          </div>
-
-          {/* Project 2 */}
-          <div className="project-card">
-            <div className="project-img">
-              <img src="/images/raih-project-2.png" alt="Team Ikigai" />
-            </div>
-            <div className="project-content">
-              <h3>Team Ikigai</h3>
-              <p>
-                A portfolio-style website showcasing team achievements and project milestones with an elegant interface.
-              </p>
-              <div className="tech-used">
-                <span>HTML</span><span>CSS</span><span>JavaScript</span><span>Bootstrap</span>
-              </div>
-              <a href="https://github.com" className="source-link" target="_blank" rel="noopener noreferrer">View Source <i className="bi bi-arrow-up-right"></i></a>
-            </div>
-          </div>
-
-          {/* Project 3 */}
-          <div className="project-card">
-            <div className="project-img">
-              <img src="/images/raih-project-3.png" alt="Order Tracking System" />
-            </div>
-            <div className="project-content">
-              <h3>Santhwanam Care</h3>
-              <p>
-                A website for palliative care services, providing information and resources for patients and families.
-              </p>
-              <div className="tech-used">
-                <span>Python</span><span>Django</span><span>MySQL</span><span>React</span>
-              </div>
-              <a href="https://github.com" className="source-link" target="_blank" rel="noopener noreferrer">View Source <i className="bi bi-arrow-up-right"></i></a>
-            </div>
-          </div>
-
-          {/* Project 4 */}
-          <div className="project-card">
-            <div className="project-img">
-              <img src="/images/raih-project-4.png" alt="Irshadiyya College" />
-            </div>
-            <div className="project-content">
-              <h3>Raihsoft.</h3>
-              <p>
-                A responsive software company website developed with a clean layout, modern design, and optimized
-                performance.
-              </p>
-              <div className="tech-used">
-                <span>HTML</span><span>CSS</span><span>JavaScript</span><span>Bootstrap</span>
-              </div>
-              <a href="https://github.com" className="source-link" target="_blank" rel="noopener noreferrer">View Source <i className="bi bi-arrow-up-right"></i></a>
-            </div>
-          </div>
-
-          {/* Project 5 */}
-          <div className="project-card">
-            <div className="project-img">
-              <img src="/images/pro2.png" alt="Order Tracking System" />
-            </div>
-            <div className="project-content">
-              <h3>Order Tracking System</h3>
-              <p>
-                A web-based system for tracking customer orders with real-time updates and secure authentication.
-              </p>
-              <div className="tech-used">
-                <span>Python</span><span>Django</span><span>MySQL</span><span>HTML</span><span>CSS</span>
-              </div>
-              <a href="https://github.com" className="source-link" target="_blank" rel="noopener noreferrer">View Source <i className="bi bi-arrow-up-right"></i></a>
-            </div>
-          </div>
+            ))}
         </div>
       </section>
 
